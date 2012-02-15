@@ -1,16 +1,494 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[AzuWis Blog]]></title>
   <link href="http://azuwis.github.com/atom.xml" rel="self"/>
   <link href="http://azuwis.github.com/"/>
-  <updated>2012-02-15T15:32:39+08:00</updated>
+  <updated>2012-02-15T16:55:06+08:00</updated>
   <id>http://azuwis.github.com/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Zhong Jianxin]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Debootstrap x86_64 Debian on an i386 Debian]]></title>
+    <link href="http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/"/>
+    <updated>2009-11-24T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian</id>
+    <content type="html"><![CDATA[<p>I know that an i386 Debian can be easily installed using debootstrap on a
+already installed x86_64 Debian.</p>
+
+<p>But the scenario is an i386 Debian is already installed on a machine that has a
+x86_64 CPU, and I want to bootstrap a x86_64 Debian on it. Can this be done?</p>
+
+<p>The answer is yes, with a bit more extra work.</p>
+
+<p>First install a x86_64 kernel, so that debootstrap can run x86_64 apps in the
+chroot. An i386 system can run under a x86_64 kernel, and Debian has prepared
+everything for you, just:</p>
+
+<pre><code># aptitude install linux-image-2.6-amd64
+# update-grub # just in case dpkg won't run this for you
+# reboot
+</code></pre>
+
+<p>Select x86_64 kernel in the grub menu and boot, and the rest is just a normal
+debootstrap process:</p>
+
+<pre><code># fdisk /dev/sdX # partition
+# mkdir /mnt/target
+# mount /mnt/target # mount all target partitions, including /boot, /home...
+# debootstrap --verbose --arch amd64 unstable /mnt/target
+# mount -o bind /proc /mnt/target/proc
+# mount -o bind /dev /mnt/target/dev
+# chroot /mnt/target
+# dpkg-reconfigure debconf # set to low
+# dpkg-reconfigure -a # reconfigure all packages
+# aptitude # install needed packages, remember to install locales
+# vi /etc/fstab
+# aptitude install linux-image-2.6-amd64 # install kernel inside the chroot
+# passwd # change root password
+# useradd -m -s /bin/bash normal_user # add a normal user
+</code></pre>
+
+<p>Exit chroot and add the new entry in grub&#8217;s config file, reboot. Now you have a
+newly installed x86_64 Debian.</p>
+
+<p>For more detail, see <a href="http://www.debian.org/releases/stable/amd64/apds03.html.en">this chapter</a> of Debian GNU/Linux Installation Guide
+and debootstrap manual.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Autohotkey Script For Fullscreen Windowed War3]]></title>
+    <link href="http://azuwis.github.com/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/"/>
+    <updated>2009-11-13T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3</id>
+    <content type="html"><![CDATA[<p><img src="http://www.autohotkey.com/docs/images/AutoHotkey_logo.gif" alt="autohotkey" />
+If you like me, press <code>alt+tab</code> a lot when playing war3, maybe here is what you
+want.</p>
+
+<p>In normal fullscreen mode of war3, video display mode will change and cause
+flicking every time you alt-tab out and in. This is annoying.</p>
+
+<p>Add <code>-window</code> param to the war3 startup shortcut, this will let war3 run in
+window mode. Use this piece of <a href="http://www.autohotkey.com/">autohotkey</a> script to remove the window
+decoration and border, and make window fullscreen:</p>
+
+<pre><code>WinSet, Style, -0xC40000, Warcraft III
+WinMaximize, Warcraft III
+</code></pre>
+
+<p>Script file <a href="http://azuwis.github.com/stack/fullscreen-windowed.ahk">here</a>, base on <a href="http://www.garena.com/forum/viewthread.php?tid=212884">Window Tools</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Custom Debian Repository]]></title>
+    <link href="http://azuwis.github.com/blog/2008/12/12/custom-debian-repository/"/>
+    <updated>2008-12-12T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/12/12/custom-debian-repository</id>
+    <content type="html"><![CDATA[<p>This is not a complete howto, I just wrote it for memorizing.</p>
+
+<h2>preparation</h2>
+
+<pre><code>$ git clone git://git.debian.org/git/buildd-tools/buildd.git
+$ cd buildd &amp;&amp; debuild binary
+# dpkg -i ../buildd_*.deb
+# aptitude install sbuild wanna-build buildd quin-diff dupload reprepro inoticoming
+</code></pre>
+
+<h2>sbuild</h2>
+
+<p>create chroots, watch final output:</p>
+
+<pre><code># useradd -m -s /bin/bash buildd
+# sbuild-createchroot --include="pkg-config" --arch=i386 sid /home/buildd/chroot/unstable http://ftp.debian.org/debian
+</code></pre>
+
+<p>refine auto added schroot config file:</p>
+
+<pre><code># mv /etc/schroot/chroot.d/sid-i386-sbuild.pk4BSL /etc/schroot/chroot.d/sid-i386-sbuild
+# edit /etc/schroot/chroot.d/sid-i386-sbuild, add [unstable-i386-sbuild]
+</code></pre>
+
+<p>edit /home/buildd/chroot/unstable/etc/apt/sources.list and /home/buildd/chroot/unstable/etc/apt/preferences:</p>
+
+<ul>
+<li><p>add local repo to sources.list:</p>
+
+<pre><code>  deb http://your-repo/debian sid main
+  deb-src http://your-repo/debian sid main
+</code></pre></li>
+<li><p>prefer local repo:</p>
+
+<pre><code>  Package: *
+  Pin: release o=Azuwis, a=unstable  # (for o=Azuwis, see reprepro setup)
+  Pin-Priority: 1000
+
+  Package: *
+  Pin: release a=unstable
+  Pin-Priority: 500
+</code></pre></li>
+</ul>
+
+
+<p>let user buildd use sbuild:</p>
+
+<pre><code># sbuild-adduser buildd
+# su - buildd
+$ cp /usr/share/doc/sbuild/examples/example.sbuildrc ~/.sbuildrc
+    $mailto='azuwis@163.org';
+    $apt_update = 1;
+    $key_id = 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;';
+    $pgp_options = '';
+</code></pre>
+
+<p>generate gpg key for sbuild to sign and upload:</p>
+
+<pre><code>$ echo -n "" | gpg
+$ echo -n "" | gpg
+$ gpg --gen-key
+  ... use 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;'
+</code></pre>
+
+<p>test sbuild and gpg sign, watch ouput and email:</p>
+
+<pre><code>$ sbuild hello_2.2-3
+</code></pre>
+
+<h2>buildd</h2>
+
+<pre><code>$ mkdir -p .ssh build logs mqueue old-logs stats/graphs upload upload-security
+$ chmod o= .ssh upload-security old-logs mqueue logs build
+$ zcat /usr/share/doc/buildd/examples/buildd.conf.gz &gt; buildd.conf
+    $admin_mail = 'azuwis@163.org';
+    $statistics_mail = 'azuwis@163.org';
+    $dupload_to = "azuwis"; # see dupload below
+$ zcat /usr/share/doc/buildd/examples/crontab.gz &gt; cronjob
+    10,25,40,55 * * * * /usr/bin/buildd-uploader
+    20          * * * * /usr/bin/buildd-watcher
+$ crontab cronjob
+</code></pre>
+
+<h2>dupload</h2>
+
+<p>edit ~/.dupload.conf</p>
+
+<pre><code>package config;
+$cfg{'azuwis'} = {
+    fqdn =&gt; "azuwis.people.163.org",
+    method =&gt; "ftp",
+    incoming =&gt; "/pub/UploadQueue/",
+    login =&gt; "anonymous",
+    dinstall_runs =&gt; 1,
+};
+1;
+</code></pre>
+
+<h2>wanna-build</h2>
+
+<pre><code>$ mkdir ~/wanna-build
+$ chown 2755 ~/wanna-build
+$ cp /etc/buildd/wanna-build.conf ~/.wanna-buildrc
+    $basedir = "/home/buildd/wanna-build";
+    $db_maint = 'azuwis@163.org';
+    $notforus_maint = 'azuwis@163.org';
+    $log_mail = 'azuwis@163.org';
+    $stat_mail = 'azuwis@163.org';
+    $web_stats = "/home/buildd/wanna-build/stats.txt";
+</code></pre>
+
+<h2>reprepro</h2>
+
+<pre><code># useradd -m -s /bin/bash reprepro
+# su - reprepro
+</code></pre>
+
+<p>edit conf/distributions:</p>
+
+<pre><code>Origin: Azuwis
+Label: Azuwis
+Suite: unstable
+Codename: sid
+Architectures: i386 source
+Components: main
+Description: Random packages not in offical Debian archive
+SignWith: yes
+Uploaders: uploaders
+DscIndices: Sources Release . .gz .bz2
+DebIndices: Packages Release . .gz .bz2
+
+Origin: Azuwis
+Label: Azuwis
+Suite: experimental
+Codename: experimental
+AlsoAcceptFor: UNRELEASED
+Architectures: i386 source
+Components: main
+Description: Random packages not in offical Debian archive and experimental; use at your own risk.
+SignWith: yes
+NotAutomatic: yes
+Uploaders: uploaders
+DscIndices: Sources Release . .gz .bz2
+DebIndices: Packages Release . .gz .bz2
+</code></pre>
+
+<p>edit conf/uploaders, only allow some users to upload, gpg pubkeys need to be imported, see below for how to get key-id and how to import:</p>
+
+<pre><code>allow * by key 5F617B74853F1566 # Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;
+</code></pre>
+
+<p>edit conf/incoming:</p>
+
+<pre><code>Name: incoming
+IncomingDir: incoming
+TempDir: temp
+Allow: unstable&gt;sid experimental&gt;experimental UNRELEASED&gt;experimental
+</code></pre>
+
+<p>prepare for ftp upload:</p>
+
+<pre><code># chown reprepro:nogroup /home/ftp/pub/UploadQueue # (nogroup is user ftp's main group)
+# chmod 01775 /home/ftp/pub/UploadQueue
+$ ln -s /home/ftp/pub/UploadQueue /home/reprepro/incoming
+</code></pre>
+
+<p>auto process incoming using inoticoming:</p>
+
+<pre><code>$ cp /usr/share/doc/inoticoming/examples/cronjob ~/
+    @reboot inoticoming --logfile /home/reprepro/logs/inoticoming.log /home/reprepro/incoming/ --stderr-to-log --stdout-to-log --suffix '.changes' --chdir /home/reprepro reprepro -b /home/reprepro processincoming incoming {} \;
+</code></pre>
+
+<p>import user buildd&#8217;s gpg key, import other users&#8217; in the same way, remember add key-id to conf/uploaders:</p>
+
+<pre><code>buildd@:~$ gpg --with-colons --list-secret-keys
+    sec::1024:17:5F617B74853F1566:2008-12-16::::Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;:::
+    ssb::2048:16:04A6D58060BC8BE7:2008-12-16:::::::
+buildd@:~$ gpg -a --export 5F617B74853F1566 &gt; ~/buildd.asc
+reprepro@:~$ gpg --import /home/buildd/buildd.asc
+</code></pre>
+
+<p>export reprepro&#8217;s gpg pubkey to public:</p>
+
+<pre><code>reprepro@:~$ gpg --with-colons --list-secret-keys
+    sec::1024:17:43A170358765EF08:2008-11-28::::Azuwis' Debian Repository &lt;azuwis@gmail.com&gt;:::
+    ssb::2048:16:2CEB4DD6864C12E2:2008-11-28:::::::
+reprepro@:~$ gpg -a --export 43A170358765EF08 &gt; reprepro.asc
+</code></pre>
+
+<p>trust local repo in sbuild chroots:</p>
+
+<pre><code># sbuild-shell unstable
+# apt-key add /home/reprepro/reprepro.asc
+</code></pre>
+
+<h2>Reference</h2>
+
+<ul>
+<li>/usr/share/doc/buildd/examples/buildd-setup-system.gz</li>
+<li>/usr/share/doc/reprepro/manual.html</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Compare Debian Style Version Numbers]]></title>
+    <link href="http://azuwis.github.com/blog/2008/06/17/compare-debian-style-version-numbers/"/>
+    <updated>2008-06-17T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/06/17/compare-debian-style-version-numbers</id>
+    <content type="html"><![CDATA[<p>I wanted to write a script to comparing debian style version numbers, for a
+reason I don&#8217;t remember. Today, I&#8217;ve just discover this:</p>
+
+<pre><code>$ dpkg --compare-versions 1.5.1 gt 1.5.1~svn &amp;&amp; echo "1.5.1 is greater"
+1.5.1 is greater
+</code></pre>
+
+<p>And there&#8217;re some api in package libapt-pkg-perl to, see:</p>
+
+<pre><code>$ /usr/share/doc/libapt-pkg-perl/examples/apt-version compare 1.5.1~svn 1.5.1
+[System: Debian dpkg interface; Versioning type: Standard .deb]
+* package version `1.5.1~svn' is earlier than `1.5.1'
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pastbinit]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/31/pastbinit/"/>
+    <updated>2008-05-31T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/31/pastbinit</id>
+    <content type="html"><![CDATA[<p>在 IRC 里问问题的时候经常要贴一些 log，而 <a href="http://pastebin.com">http://pastebin.com</a> 就是贴 log 的好地方，甚至还有人专门写了一个工具来贴 log，这个工具在 <a href="http://www.debian.org">Debian</a> 里有包：</p>
+
+<pre><code># aptitude install pastebinit
+</code></pre>
+
+<p>就可以安装，使用很简单：</p>
+
+<pre><code>$ pastebinit file_to_paste
+http://pastebin.com/f2a9b78ec
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Directly Modity Meta Info Of Deb Package]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/31/directly-modity-meta-info-of-deb-package/"/>
+    <updated>2008-05-31T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/31/directly-modity-meta-info-of-deb-package</id>
+    <content type="html"><![CDATA[<p>Sometime I want to modify the meta info of some deb packages directly, remove
+dependences, increase version number, etc.</p>
+
+<p>For example, fusion-icon, in compiz-fusion debian repository by <a href="http://download.tuxfamily.org/shames/debian-lenny/desktopfx/unstable/">shames</a>,
+depends on compiz-kde | compiz-gnome.</p>
+
+<p>In fact, compiz-kde or compiz-gnome are not necessary. If the desktop
+environment is Xfce or KDE4, those packages are not needed at all.</p>
+
+<p>So, here is how to directly modify deb packages without recompiling, remove
+dependence:</p>
+
+<pre><code># apt-cache policy fusion-icon
+fusion-icon:
+  Installed: (none)
+  Candidate: 0.1.2+git20080216.shame-1
+  Version table:
+     0.1.2+git20080216.shame-1 0
+        500 http://download.tuxfamily.org ./ Packages
+     0.0.0+git20071028-3 0
+        500 http://ftp.debian.org lenny/main Packages
+        300 http://ftp.debian.org sid/main Packages
+# aptitude download fusion-icon=0.1.2+git20080216.shame-1
+# dpkg-deb -x fusion-icon_0.1.2+git20080216.shame-1_amd64.deb deb/
+# dpkg-deb -e fusion-icon_0.1.2+git20080216.shame-1_amd64.deb deb/DEBIAN/
+# vi deb/DEBIAN/control ...edit the file
+# dpkg-deb -b deb/ my.deb
+# dpkg -i my.deb
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[更新 linux 内核模块的较好方法]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/29/better-way-to-update-linux-kernel-module/"/>
+    <updated>2008-05-29T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/29/better-way-to-update-linux-kernel-module</id>
+    <content type="html"><![CDATA[<p>有时候 Linux 内核模块有更新，或者有第三方的改动需要用，要替换原来的模块。</p>
+
+<p>比较简单的方法是把原来的 *.ko 文件直接替换，但这样有不好的地方，如果想换回来，比较麻烦。</p>
+
+<p>较好的方法是把模块装在 <code>/lib/modules/`uname -r`/updates/</code> 下面，再运行 depmod，这样下次开机自动加载模块，或者用 modprobe 加载模块时，就会用 updates 下面的。如:</p>
+
+<pre><code># cp libdrm/linux-core/drm.ko /lib/modules/`uname -r`/updates/
+# depmod
+# /sbin/modinfo drm
+filename:       /lib/modules/2.6.25-2-amd64/updates/drm.ko
+license:        GPL and additional rights
+description:    DRM shared core routines
+author:         Gareth Hughes, Leif Delgass, José Fonseca, Jon Smirl
+depends:
+vermagic:       2.6.25 SMP mod_unload
+parm:           debug:Enable debug output (int)
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[给 Firefox 状态栏图标重新排位]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/"/>
+    <updated>2008-05-27T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar</id>
+    <content type="html"><![CDATA[<p><img src="http://www.mozilla.com/img/tignish/about/logo/download/logo-only-preview.png" alt="Firefox" />
+Firefox 自己并不能方便的给状态栏的图标重新排序，有一个扩展叫 <a href="https://addons.mozilla.org/en-US/firefox/addon/1759">Organize Status Bar</a>，可以比较方便的做这个事情。但只是是为了重新排序而装一个扩展，似乎并不值得。</p>
+
+<p>其实，Firefox 状态栏的图标一般是由扩展产生的，图标的顺序跟扩展的安装顺序对应。通过改扩展的顺序，可以改变状态栏图标的顺序。</p>
+
+<p>在 Firefox 的配置目录(Linux 下为 ~/.mozilla/firefox/*.default/)里，extensions.ini 这个文件记录的是扩展的顺序，如：</p>
+
+<pre><code>[ExtensionDirs]
+Extension0=/home/azuwis/.mozilla/firefox/cv7nxof9.default/extensions/firebug@software.joehewitt.com
+Extension1=/home/azuwis/.mozilla/firefox/cv7nxof9.default/extensions/{0C4B554C-05D9-11DB-9804-B622A1EF5492}
+</code></pre>
+
+<p>通过查看 extensions.rdf 这个文件，可以得到扩展的 ID 和名称的对应，如：</p>
+
+<pre><code>&lt;RDF:Description RDF:about="urn:mozilla:item:{73a6fe31-595d-460b-a920-fcc0f8843232}"
+    ...
+    NS1:name="NoScript"
+    ...
+</code></pre>
+
+<p>就知道 {73a6fe31-595d-460b-a920-fcc0f8843232} 这个 ID 是对应 NoScript 这个扩展的，根据这点修改 extensions.ini 的内容，改变扩展的顺序，重启 Firefox，状态栏图标的顺序就会跟著改变。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Mouse To Select Text In Aptitude]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/23/using-mouse-to-select-text-in-aptitude/"/>
+    <updated>2008-05-23T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/23/using-mouse-to-select-text-in-aptitude</id>
+    <content type="html"><![CDATA[<p>It obsessed me for a long time, but today I found the answer in aptitude&#8217;s FAQ:</p>
+
+<pre><code>1) I want to select text, why doesn't aptitude let me disable the mouse?
+
+    When a program running in an xterm is accessing the mouse, the xterm
+    disables text selection.  However, you can override this behavior and
+    perform a selection by holding the Shift key down.
+</code></pre>
+
+<p>So, just hold down shift key, copying and pasting text in aptitude&#8217;s curses interface will work as expected.</p>
+
+<p>It&#8217;s always good to look at software&#8217;s FAQ before using it.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[拿 google calendar 来做接口给自己发短信]]></title>
+    <link href="http://azuwis.github.com/blog/2008/05/21/use-google-calendar-to-send-yourself-sms/"/>
+    <updated>2008-05-21T00:00:00+08:00</updated>
+    <id>http://azuwis.github.com/blog/2008/05/21/use-google-calendar-to-send-yourself-sms</id>
+    <content type="html"><![CDATA[<p><img src="http://calendar.google.com/googlecalendar/images/calendar_logo_sm_en.gif" alt="google calendar" />
+google calendar 的短信提醒服务支持中国移动(联通不知道是不是支持)，可以通过 google 提供的 GData 接口给 google calendar 添加短信提醒，从而达到短信接口的效果。</p>
+
+<p>首先是让你的 google calendar 帐号跟你的手机绑定。</p>
+
+<p>下面是一个 ruby 代码实现添加提醒:</p>
+
+<pre><code>#!/usr/bin/ruby
+require 'rubygems'
+require 'googlecalendar'
+
+def sms(google_acount, password, message)
+  now = Time.now.utc
+  # 添加一个 360 秒后的事件
+  startTime = (now + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+  endTime = (now + 3600 + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+  g = GData.new
+  g.login(google_acount + '@gmail.com', password)
+  event = { :title=&gt;message,
+    :content=&gt;message,
+    :author=&gt;google_acount,
+    :email=&gt;google_acount + '@gmail.com',
+    :where=&gt;'some place',
+    :startTime=&gt;startTime,
+    :endTime=&gt;endTime
+  }
+  # 给事件添加一个提前 5 分钟的 sms 提醒
+  g.add_reminder(event, 5, 'sms')
+  g.new_event(event)
+end
+
+sms(google_acount, password, 'a test')
+</code></pre>
+
+<p>googlecalendar 的 rubygem 可以用 gem install googlecalendar 来安装。</p>
+
+<p>还有 <a href="http://code.google.com/p/gcalcli/">gcalcli</a> 命令行工具，可以管理 google calendar，不喜欢自己写代码的也可以用这个实现。</p>
+]]></content>
+  </entry>
   
 </feed>

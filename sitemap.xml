@@ -1,11 +1,65 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>
+            http://azuwis.github.com/blog/2008/05/21/use-google-calendar-to-send-yourself-sms/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2008/05/23/using-mouse-to-select-text-in-aptitude/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2008/05/29/better-way-to-update-linux-kernel-module/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2008/05/31/directly-modity-meta-info-of-deb-package/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://azuwis.github.com/blog/2008/05/31/pastbinit/</loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://azuwis.github.com/blog/2008/06/17/compare-debian-style-version-numbers/</loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://azuwis.github.com/blog/2008/12/12/custom-debian-repository/</loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/
+        </loc>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://azuwis.github.com/blog/archives/</loc>
-        <lastmod>2012-02-15T15:32:04+08:00</lastmod>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
     </url>
     <url>
         <loc>http://azuwis.github.com/</loc>
-        <lastmod>2012-02-15T15:32:04+08:00</lastmod>
+        <lastmod>2012-02-15T16:15:40+08:00</lastmod>
     </url>
 </urlset>

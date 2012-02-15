@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - AzuWis Blog</title>
+  <title>Debootstrap x86_64 Debian on an i386 Debian - AzuWis Blog</title>
   <meta name="author" content="Zhong Jianxin">
 
   
-  <meta name="description" content="Blog Archive 2009 Debootstrap x86_64 Debian on an i386 Debian
-Nov 24 2009 Autohotkey Script For Fullscreen Windowed War3
-Nov 13 2009 2008 Custom &hellip;">
+  <meta name="description" content="I know that an i386 Debian can be easily installed using debootstrap on a
+already installed x86_64 Debian. But the scenario is an i386 Debian is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ Nov 13 2009 2008 Custom &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://azuwis.github.com/blog/archives">
+  <link rel="canonical" href="http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,124 +76,122 @@ Nov 13 2009 2008 Custom &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">Debootstrap X86_64 Debian on an I386 Debian</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-11-24T00:00:00+08:00" pubdate data-updated="true">Nov 24<span>th</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><p>I know that an i386 Debian can be easily installed using debootstrap on a
+already installed x86_64 Debian.</p>
 
-  
-  <h2>2009</h2>
+<p>But the scenario is an i386 Debian is already installed on a machine that has a
+x86_64 CPU, and I want to bootstrap a x86_64 Debian on it. Can this be done?</p>
 
-<article>
-  
-<h1><a href="/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/">Debootstrap x86_64 Debian on an i386 Debian</a></h1>
-<time datetime="2009-11-24T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>24</span> <span class='year'>2009</span></time>
+<p>The answer is yes, with a bit more extra work.</p>
 
+<p>First install a x86_64 kernel, so that debootstrap can run x86_64 apps in the
+chroot. An i386 system can run under a x86_64 kernel, and Debian has prepared
+everything for you, just:</p>
 
-</article>
+<pre><code># aptitude install linux-image-2.6-amd64
+# update-grub # just in case dpkg won't run this for you
+# reboot
+</code></pre>
 
+<p>Select x86_64 kernel in the grub menu and boot, and the rest is just a normal
+debootstrap process:</p>
 
+<pre><code># fdisk /dev/sdX # partition
+# mkdir /mnt/target
+# mount /mnt/target # mount all target partitions, including /boot, /home...
+# debootstrap --verbose --arch amd64 unstable /mnt/target
+# mount -o bind /proc /mnt/target/proc
+# mount -o bind /dev /mnt/target/dev
+# chroot /mnt/target
+# dpkg-reconfigure debconf # set to low
+# dpkg-reconfigure -a # reconfigure all packages
+# aptitude # install needed packages, remember to install locales
+# vi /etc/fstab
+# aptitude install linux-image-2.6-amd64 # install kernel inside the chroot
+# passwd # change root password
+# useradd -m -s /bin/bash normal_user # add a normal user
+</code></pre>
 
-<article>
-  
-<h1><a href="/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/">Autohotkey Script For Fullscreen Windowed War3</a></h1>
-<time datetime="2009-11-13T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>13</span> <span class='year'>2009</span></time>
+<p>Exit chroot and add the new entry in grub&#8217;s config file, reboot. Now you have a
+newly installed x86_64 Debian.</p>
 
-
-</article>
-
-
-
-  
-  <h2>2008</h2>
-
-<article>
-  
-<h1><a href="/blog/2008/12/12/custom-debian-repository/">Custom Debian Repository</a></h1>
-<time datetime="2008-12-12T00:00:00+08:00" pubdate><span class='month'>Dec</span> <span class='day'>12</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/06/17/compare-debian-style-version-numbers/">Compare Debian Style Version Numbers</a></h1>
-<time datetime="2008-06-17T00:00:00+08:00" pubdate><span class='month'>Jun</span> <span class='day'>17</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/31/pastbinit/">Pastbinit</a></h1>
-<time datetime="2008-05-31T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>31</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/31/directly-modity-meta-info-of-deb-package/">Directly Modity Meta Info Of Deb Package</a></h1>
-<time datetime="2008-05-31T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>31</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/29/better-way-to-update-linux-kernel-module/">更新 linux 内核模块的较好方法</a></h1>
-<time datetime="2008-05-29T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>29</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/">给 Firefox 状态栏图标重新排位</a></h1>
-<time datetime="2008-05-27T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>27</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/23/using-mouse-to-select-text-in-aptitude/">Using Mouse To Select Text In Aptitude</a></h1>
-<time datetime="2008-05-23T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>23</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/21/use-google-calendar-to-send-yourself-sms/">拿 google calendar 来做接口给自己发短信</a></h1>
-<time datetime="2008-05-21T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>21</span> <span class='year'>2008</span></time>
-
-
-</article>
-
+<p>For more detail, see <a href="http://www.debian.org/releases/stable/amd64/apds03.html.en">this chapter</a> of Debian GNU/Linux Installation Guide
+and debootstrap manual.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Zhong Jianxin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-11-24T00:00:00+08:00" pubdate data-updated="true">Nov 24<span>th</span>, 2009</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/" data-via="azuwis" data-counturl="http://azuwis.github.com/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/" title="Previous Post: Autohotkey Script For Fullscreen Windowed War3">&laquo; Autohotkey Script For Fullscreen Windowed War3</a>
+      
+      
+    </p>
+  </footer>
 </article>
 
 </div>
@@ -288,7 +285,7 @@ Nov 13 2009 2008 Custom &hellip;">
 
 <section class="tag-cloud">
   <h1>Tags</h1>
-  <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> 
+  <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> 
 </section>
 
   

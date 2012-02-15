@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Custom Debian Repository - AzuWis Blog</title>
+  <meta name="author" content="Zhong Jianxin">
+
+  
+  <meta name="description" content="This is not a complete howto, I just wrote it for memorizing. preparation $ git clone git://git.debian.org/git/buildd-tools/buildd.git
+$ cd buildd & &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://azuwis.github.com/blog/2008/12/12/custom-debian-repository">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="AzuWis Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10843565-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">AzuWis Blog</a></h1>
+  
+    <h2>Blogging Like a Hacker.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:azuwis.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Custom Debian Repository</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-12-12T00:00:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2008</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>This is not a complete howto, I just wrote it for memorizing.</p>
+
+<h2>preparation</h2>
+
+<pre><code>$ git clone git://git.debian.org/git/buildd-tools/buildd.git
+$ cd buildd &amp;&amp; debuild binary
+# dpkg -i ../buildd_*.deb
+# aptitude install sbuild wanna-build buildd quin-diff dupload reprepro inoticoming
+</code></pre>
+
+<h2>sbuild</h2>
+
+<p>create chroots, watch final output:</p>
+
+<pre><code># useradd -m -s /bin/bash buildd
+# sbuild-createchroot --include="pkg-config" --arch=i386 sid /home/buildd/chroot/unstable http://ftp.debian.org/debian
+</code></pre>
+
+<p>refine auto added schroot config file:</p>
+
+<pre><code># mv /etc/schroot/chroot.d/sid-i386-sbuild.pk4BSL /etc/schroot/chroot.d/sid-i386-sbuild
+# edit /etc/schroot/chroot.d/sid-i386-sbuild, add [unstable-i386-sbuild]
+</code></pre>
+
+<p>edit /home/buildd/chroot/unstable/etc/apt/sources.list and /home/buildd/chroot/unstable/etc/apt/preferences:</p>
+
+<ul>
+<li><p>add local repo to sources.list:</p>
+
+<pre><code>  deb http://your-repo/debian sid main
+  deb-src http://your-repo/debian sid main
+</code></pre></li>
+<li><p>prefer local repo:</p>
+
+<pre><code>  Package: *
+  Pin: release o=Azuwis, a=unstable  # (for o=Azuwis, see reprepro setup)
+  Pin-Priority: 1000
+
+  Package: *
+  Pin: release a=unstable
+  Pin-Priority: 500
+</code></pre></li>
+</ul>
+
+
+<p>let user buildd use sbuild:</p>
+
+<pre><code># sbuild-adduser buildd
+# su - buildd
+$ cp /usr/share/doc/sbuild/examples/example.sbuildrc ~/.sbuildrc
+    $mailto='azuwis@163.org';
+    $apt_update = 1;
+    $key_id = 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;';
+    $pgp_options = '';
+</code></pre>
+
+<p>generate gpg key for sbuild to sign and upload:</p>
+
+<pre><code>$ echo -n "" | gpg
+$ echo -n "" | gpg
+$ gpg --gen-key
+  ... use 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;'
+</code></pre>
+
+<p>test sbuild and gpg sign, watch ouput and email:</p>
+
+<pre><code>$ sbuild hello_2.2-3
+</code></pre>
+
+<h2>buildd</h2>
+
+<pre><code>$ mkdir -p .ssh build logs mqueue old-logs stats/graphs upload upload-security
+$ chmod o= .ssh upload-security old-logs mqueue logs build
+$ zcat /usr/share/doc/buildd/examples/buildd.conf.gz &gt; buildd.conf
+    $admin_mail = 'azuwis@163.org';
+    $statistics_mail = 'azuwis@163.org';
+    $dupload_to = "azuwis"; # see dupload below
+$ zcat /usr/share/doc/buildd/examples/crontab.gz &gt; cronjob
+    10,25,40,55 * * * * /usr/bin/buildd-uploader
+    20          * * * * /usr/bin/buildd-watcher
+$ crontab cronjob
+</code></pre>
+
+<h2>dupload</h2>
+
+<p>edit ~/.dupload.conf</p>
+
+<pre><code>package config;
+$cfg{'azuwis'} = {
+    fqdn =&gt; "azuwis.people.163.org",
+    method =&gt; "ftp",
+    incoming =&gt; "/pub/UploadQueue/",
+    login =&gt; "anonymous",
+    dinstall_runs =&gt; 1,
+};
+1;
+</code></pre>
+
+<h2>wanna-build</h2>
+
+<pre><code>$ mkdir ~/wanna-build
+$ chown 2755 ~/wanna-build
+$ cp /etc/buildd/wanna-build.conf ~/.wanna-buildrc
+    $basedir = "/home/buildd/wanna-build";
+    $db_maint = 'azuwis@163.org';
+    $notforus_maint = 'azuwis@163.org';
+    $log_mail = 'azuwis@163.org';
+    $stat_mail = 'azuwis@163.org';
+    $web_stats = "/home/buildd/wanna-build/stats.txt";
+</code></pre>
+
+<h2>reprepro</h2>
+
+<pre><code># useradd -m -s /bin/bash reprepro
+# su - reprepro
+</code></pre>
+
+<p>edit conf/distributions:</p>
+
+<pre><code>Origin: Azuwis
+Label: Azuwis
+Suite: unstable
+Codename: sid
+Architectures: i386 source
+Components: main
+Description: Random packages not in offical Debian archive
+SignWith: yes
+Uploaders: uploaders
+DscIndices: Sources Release . .gz .bz2
+DebIndices: Packages Release . .gz .bz2
+
+Origin: Azuwis
+Label: Azuwis
+Suite: experimental
+Codename: experimental
+AlsoAcceptFor: UNRELEASED
+Architectures: i386 source
+Components: main
+Description: Random packages not in offical Debian archive and experimental; use at your own risk.
+SignWith: yes
+NotAutomatic: yes
+Uploaders: uploaders
+DscIndices: Sources Release . .gz .bz2
+DebIndices: Packages Release . .gz .bz2
+</code></pre>
+
+<p>edit conf/uploaders, only allow some users to upload, gpg pubkeys need to be imported, see below for how to get key-id and how to import:</p>
+
+<pre><code>allow * by key 5F617B74853F1566 # Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;
+</code></pre>
+
+<p>edit conf/incoming:</p>
+
+<pre><code>Name: incoming
+IncomingDir: incoming
+TempDir: temp
+Allow: unstable&gt;sid experimental&gt;experimental UNRELEASED&gt;experimental
+</code></pre>
+
+<p>prepare for ftp upload:</p>
+
+<pre><code># chown reprepro:nogroup /home/ftp/pub/UploadQueue # (nogroup is user ftp's main group)
+# chmod 01775 /home/ftp/pub/UploadQueue
+$ ln -s /home/ftp/pub/UploadQueue /home/reprepro/incoming
+</code></pre>
+
+<p>auto process incoming using inoticoming:</p>
+
+<pre><code>$ cp /usr/share/doc/inoticoming/examples/cronjob ~/
+    @reboot inoticoming --logfile /home/reprepro/logs/inoticoming.log /home/reprepro/incoming/ --stderr-to-log --stdout-to-log --suffix '.changes' --chdir /home/reprepro reprepro -b /home/reprepro processincoming incoming {} \;
+</code></pre>
+
+<p>import user buildd&#8217;s gpg key, import other users&#8217; in the same way, remember add key-id to conf/uploaders:</p>
+
+<pre><code>buildd@:~$ gpg --with-colons --list-secret-keys
+    sec::1024:17:5F617B74853F1566:2008-12-16::::Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;:::
+    ssb::2048:16:04A6D58060BC8BE7:2008-12-16:::::::
+buildd@:~$ gpg -a --export 5F617B74853F1566 &gt; ~/buildd.asc
+reprepro@:~$ gpg --import /home/buildd/buildd.asc
+</code></pre>
+
+<p>export reprepro&#8217;s gpg pubkey to public:</p>
+
+<pre><code>reprepro@:~$ gpg --with-colons --list-secret-keys
+    sec::1024:17:43A170358765EF08:2008-11-28::::Azuwis' Debian Repository &lt;azuwis@gmail.com&gt;:::
+    ssb::2048:16:2CEB4DD6864C12E2:2008-11-28:::::::
+reprepro@:~$ gpg -a --export 43A170358765EF08 &gt; reprepro.asc
+</code></pre>
+
+<p>trust local repo in sbuild chroots:</p>
+
+<pre><code># sbuild-shell unstable
+# apt-key add /home/reprepro/reprepro.asc
+</code></pre>
+
+<h2>Reference</h2>
+
+<ul>
+<li>/usr/share/doc/buildd/examples/buildd-setup-system.gz</li>
+<li>/usr/share/doc/reprepro/manual.html</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Zhong Jianxin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-12-12T00:00:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://azuwis.github.com/blog/2008/12/12/custom-debian-repository/" data-via="azuwis" data-counturl="http://azuwis.github.com/blog/2008/12/12/custom-debian-repository/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/06/17/compare-debian-style-version-numbers/" title="Previous Post: Compare Debian Style Version Numbers">&laquo; Compare Debian Style Version Numbers</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/" title="next Post: Autohotkey Script For Fullscreen Windowed War3">Autohotkey Script For Fullscreen Windowed War3 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/">Debootstrap x86_64 Debian on an i386 Debian</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/">Autohotkey Script For Fullscreen Windowed War3</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/12/12/custom-debian-repository/">Custom Debian Repository</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/06/17/compare-debian-style-version-numbers/">Compare Debian Style Version Numbers</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/05/31/pastbinit/">Pastbinit</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/azuwis">@azuwis</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'azuwis',
+            count: 4,
+            skip_forks: false,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("azuwis", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/azuwis" class="twitter-follow-button" data-show-count="false">Follow @azuwis</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/111847809283684948912?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section class="tag-cloud">
+  <h1>Tags</h1>
+  <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> 
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Zhong Jianxin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'azuwis';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

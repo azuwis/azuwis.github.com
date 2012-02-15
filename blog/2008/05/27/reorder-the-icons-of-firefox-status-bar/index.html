@@ -5,13 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - AzuWis Blog</title>
+  <title>给 Firefox 状态栏图标重新排位 - AzuWis Blog</title>
   <meta name="author" content="Zhong Jianxin">
 
   
-  <meta name="description" content="Blog Archive 2009 Debootstrap x86_64 Debian on an i386 Debian
-Nov 24 2009 Autohotkey Script For Fullscreen Windowed War3
-Nov 13 2009 2008 Custom &hellip;">
+  <meta name="description" content="Firefox 自己并不能方便的给状态栏的图标重新排序，有一个扩展叫 Organize Status Bar，可以比较方便的做这个事情。但只是是为了重新排序而装一个扩展，似乎并不值得。 其实，Firefox 状态栏的图标一般是由扩展产生的，图标的顺序跟扩展的安装顺序对应。通过改扩展的顺序， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +18,7 @@ Nov 13 2009 2008 Custom &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://azuwis.github.com/blog/archives">
+  <link rel="canonical" href="http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,124 +75,104 @@ Nov 13 2009 2008 Custom &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">给 Firefox 状态栏图标重新排位</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-27T00:00:00+08:00" pubdate data-updated="true">May 27<span>th</span>, 2008</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><p><img src="http://www.mozilla.com/img/tignish/about/logo/download/logo-only-preview.png" alt="Firefox" />
+Firefox 自己并不能方便的给状态栏的图标重新排序，有一个扩展叫 <a href="https://addons.mozilla.org/en-US/firefox/addon/1759">Organize Status Bar</a>，可以比较方便的做这个事情。但只是是为了重新排序而装一个扩展，似乎并不值得。</p>
 
-  
-  <h2>2009</h2>
+<p>其实，Firefox 状态栏的图标一般是由扩展产生的，图标的顺序跟扩展的安装顺序对应。通过改扩展的顺序，可以改变状态栏图标的顺序。</p>
 
-<article>
-  
-<h1><a href="/blog/2009/11/24/debootstrap-x86-64-debian-on-an-i386-debian/">Debootstrap x86_64 Debian on an i386 Debian</a></h1>
-<time datetime="2009-11-24T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>24</span> <span class='year'>2009</span></time>
+<p>在 Firefox 的配置目录(Linux 下为 ~/.mozilla/firefox/*.default/)里，extensions.ini 这个文件记录的是扩展的顺序，如：</p>
 
+<pre><code>[ExtensionDirs]
+Extension0=/home/azuwis/.mozilla/firefox/cv7nxof9.default/extensions/firebug@software.joehewitt.com
+Extension1=/home/azuwis/.mozilla/firefox/cv7nxof9.default/extensions/{0C4B554C-05D9-11DB-9804-B622A1EF5492}
+</code></pre>
 
-</article>
+<p>通过查看 extensions.rdf 这个文件，可以得到扩展的 ID 和名称的对应，如：</p>
 
+<pre><code>&lt;RDF:Description RDF:about="urn:mozilla:item:{73a6fe31-595d-460b-a920-fcc0f8843232}"
+    ...
+    NS1:name="NoScript"
+    ...
+</code></pre>
 
-
-<article>
-  
-<h1><a href="/blog/2009/11/13/autohotkey-script-for-fullscreen-windowed-war3/">Autohotkey Script For Fullscreen Windowed War3</a></h1>
-<time datetime="2009-11-13T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>13</span> <span class='year'>2009</span></time>
-
-
-</article>
-
-
-
-  
-  <h2>2008</h2>
-
-<article>
-  
-<h1><a href="/blog/2008/12/12/custom-debian-repository/">Custom Debian Repository</a></h1>
-<time datetime="2008-12-12T00:00:00+08:00" pubdate><span class='month'>Dec</span> <span class='day'>12</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/06/17/compare-debian-style-version-numbers/">Compare Debian Style Version Numbers</a></h1>
-<time datetime="2008-06-17T00:00:00+08:00" pubdate><span class='month'>Jun</span> <span class='day'>17</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/31/pastbinit/">Pastbinit</a></h1>
-<time datetime="2008-05-31T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>31</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/31/directly-modity-meta-info-of-deb-package/">Directly Modity Meta Info Of Deb Package</a></h1>
-<time datetime="2008-05-31T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>31</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/29/better-way-to-update-linux-kernel-module/">更新 linux 内核模块的较好方法</a></h1>
-<time datetime="2008-05-29T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>29</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/">给 Firefox 状态栏图标重新排位</a></h1>
-<time datetime="2008-05-27T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>27</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/23/using-mouse-to-select-text-in-aptitude/">Using Mouse To Select Text In Aptitude</a></h1>
-<time datetime="2008-05-23T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>23</span> <span class='year'>2008</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2008/05/21/use-google-calendar-to-send-yourself-sms/">拿 google calendar 来做接口给自己发短信</a></h1>
-<time datetime="2008-05-21T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>21</span> <span class='year'>2008</span></time>
-
-
-</article>
-
+<p>就知道 {73a6fe31-595d-460b-a920-fcc0f8843232} 这个 ID 是对应 NoScript 这个扩展的，根据这点修改 extensions.ini 的内容，改变扩展的顺序，重启 Firefox，状态栏图标的顺序就会跟著改变。</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Zhong Jianxin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-27T00:00:00+08:00" pubdate data-updated="true">May 27<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/" data-via="azuwis" data-counturl="http://azuwis.github.com/blog/2008/05/27/reorder-the-icons-of-firefox-status-bar/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/05/23/using-mouse-to-select-text-in-aptitude/" title="Previous Post: Using Mouse To Select Text In Aptitude">&laquo; Using Mouse To Select Text In Aptitude</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/05/29/better-way-to-update-linux-kernel-module/" title="next Post: 更新 linux 内核模块的较好方法">更新 linux 内核模块的较好方法 &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
 
 </div>
@@ -288,7 +266,7 @@ Nov 13 2009 2008 Custom &hellip;">
 
 <section class="tag-cloud">
   <h1>Tags</h1>
-  <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> 
+  <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> 
 </section>
 
   
