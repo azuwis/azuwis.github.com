@@ -102,39 +102,65 @@
   </header>
 
 
-<div class="entry-content"><p><img src="http://calendar.google.com/googlecalendar/images/calendar_logo_sm_en.gif" alt="google calendar" />
+<div class="entry-content"><p><img class="right" src="http://calendar.google.com/googlecalendar/images/calendar_logo_sm_en.gif" title="google calendar" >
 google calendar 的短信提醒服务支持中国移动(联通不知道是不是支持)，可以通过 google 提供的 GData 接口给 google calendar 添加短信提醒，从而达到短信接口的效果。</p>
 
 <p>首先是让你的 google calendar 帐号跟你的手机绑定。</p>
 
 <p>下面是一个 ruby 代码实现添加提醒:</p>
 
-<pre><code>#!/usr/bin/ruby
-require 'rubygems'
-require 'googlecalendar'
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1">#!/usr/bin/ruby</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;googlecalendar&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">sms</span><span class="p">(</span><span class="n">google_acount</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">now</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">utc</span>
+</span><span class='line'>  <span class="c1"># 添加一个 360 秒后的事件</span>
+</span><span class='line'>  <span class="n">startTime</span> <span class="o">=</span> <span class="p">(</span><span class="n">now</span> <span class="o">+</span> <span class="mi">360</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S.000Z&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">endTime</span> <span class="o">=</span> <span class="p">(</span><span class="n">now</span> <span class="o">+</span> <span class="mi">3600</span> <span class="o">+</span> <span class="mi">360</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S.000Z&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">g</span> <span class="o">=</span> <span class="no">GData</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">google_acount</span> <span class="o">+</span> <span class="s1">&#39;@gmail.com&#39;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">event</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:title</span><span class="o">=&gt;</span><span class="n">message</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:content</span><span class="o">=&gt;</span><span class="n">message</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:author</span><span class="o">=&gt;</span><span class="n">google_acount</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:email</span><span class="o">=&gt;</span><span class="n">google_acount</span> <span class="o">+</span> <span class="s1">&#39;@gmail.com&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:where</span><span class="o">=&gt;</span><span class="s1">&#39;some place&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:startTime</span><span class="o">=&gt;</span><span class="n">startTime</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:endTime</span><span class="o">=&gt;</span><span class="n">endTime</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="c1"># 给事件添加一个提前 5 分钟的 sms 提醒</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">add_reminder</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;sms&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">new_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sms</span><span class="p">(</span><span class="n">google_acount</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="s1">&#39;a test&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
 
-def sms(google_acount, password, message)
-  now = Time.now.utc
-  # 添加一个 360 秒后的事件
-  startTime = (now + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  endTime = (now + 3600 + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  g = GData.new
-  g.login(google_acount + '@gmail.com', password)
-  event = { :title=&gt;message,
-    :content=&gt;message,
-    :author=&gt;google_acount,
-    :email=&gt;google_acount + '@gmail.com',
-    :where=&gt;'some place',
-    :startTime=&gt;startTime,
-    :endTime=&gt;endTime
-  }
-  # 给事件添加一个提前 5 分钟的 sms 提醒
-  g.add_reminder(event, 5, 'sms')
-  g.new_event(event)
-end
-
-sms(google_acount, password, 'a test')
-</code></pre>
 
 <p>googlecalendar 的 rubygem 可以用 gem install googlecalendar 来安装。</p>
 
@@ -255,7 +281,7 @@ sms(google_acount, password, 'a test')
 
 <section class="tag-cloud">
   <h1>Tags</h1>
-  <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> 
+  <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> 
 </section>
 
   

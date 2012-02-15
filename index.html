@@ -118,29 +118,46 @@ x86_64 CPU, and I want to bootstrap a x86_64 Debian on it. Can this be done?</p>
 chroot. An i386 system can run under a x86_64 kernel, and Debian has prepared
 everything for you, just:</p>
 
-<pre><code># aptitude install linux-image-2.6-amd64
-# update-grub # just in case dpkg won't run this for you
-# reboot
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># aptitude install linux-image-2.6-amd64
+</span><span class='line'># update-grub # just in case dpkg won't run this for you
+</span><span class='line'># reboot</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Select x86_64 kernel in the grub menu and boot, and the rest is just a normal
 debootstrap process:</p>
 
-<pre><code># fdisk /dev/sdX # partition
-# mkdir /mnt/target
-# mount /mnt/target # mount all target partitions, including /boot, /home...
-# debootstrap --verbose --arch amd64 unstable /mnt/target
-# mount -o bind /proc /mnt/target/proc
-# mount -o bind /dev /mnt/target/dev
-# chroot /mnt/target
-# dpkg-reconfigure debconf # set to low
-# dpkg-reconfigure -a # reconfigure all packages
-# aptitude # install needed packages, remember to install locales
-# vi /etc/fstab
-# aptitude install linux-image-2.6-amd64 # install kernel inside the chroot
-# passwd # change root password
-# useradd -m -s /bin/bash normal_user # add a normal user
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># fdisk /dev/sdX # partition
+</span><span class='line'># mkdir /mnt/target
+</span><span class='line'># mount /mnt/target # mount all target partitions, including /boot, /home...
+</span><span class='line'># debootstrap --verbose --arch amd64 unstable /mnt/target
+</span><span class='line'># mount -o bind /proc /mnt/target/proc
+</span><span class='line'># mount -o bind /dev /mnt/target/dev
+</span><span class='line'># chroot /mnt/target
+</span><span class='line'># dpkg-reconfigure debconf # set to low
+</span><span class='line'># dpkg-reconfigure -a # reconfigure all packages
+</span><span class='line'># aptitude # install needed packages, remember to install locales
+</span><span class='line'># vi /etc/fstab
+</span><span class='line'># aptitude install linux-image-2.6-amd64 # install kernel inside the chroot
+</span><span class='line'># passwd # change root password
+</span><span class='line'># useradd -m -s /bin/bash normal_user # add a normal user</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Exit chroot and add the new entry in grub&#8217;s config file, reboot. Now you have a
 newly installed x86_64 Debian.</p>
@@ -182,7 +199,7 @@ and debootstrap manual.</p>
   </header>
 
 
-  <div class="entry-content"><p><img src="http://www.autohotkey.com/docs/images/AutoHotkey_logo.gif" alt="autohotkey" />
+  <div class="entry-content"><p><img class="right" src="http://www.autohotkey.com/docs/images/AutoHotkey_logo.gif" title="autohotkey" >
 If you like me, press <code>alt+tab</code> a lot when playing war3, maybe here is what you
 want.</p>
 
@@ -193,9 +210,11 @@ flicking every time you alt-tab out and in. This is annoying.</p>
 window mode. Use this piece of <a href="http://www.autohotkey.com/">autohotkey</a> script to remove the window
 decoration and border, and make window fullscreen:</p>
 
-<pre><code>WinSet, Style, -0xC40000, Warcraft III
-WinMaximize, Warcraft III
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>WinSet, Style, -0xC40000, Warcraft III
+</span><span class='line'>WinMaximize, Warcraft III</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Script file <a href="/stack/fullscreen-windowed.ahk">here</a>, base on <a href="http://www.garena.com/forum/viewthread.php?tid=212884">Window Tools</a>.</p>
 </div>
@@ -265,178 +284,15 @@ $ cd buildd &amp;&amp; debuild binary
 <pre><code>  deb http://your-repo/debian sid main
   deb-src http://your-repo/debian sid main
 </code></pre></li>
-<li><p>prefer local repo:</p>
-
-<pre><code>  Package: *
-  Pin: release o=Azuwis, a=unstable  # (for o=Azuwis, see reprepro setup)
-  Pin-Priority: 1000
-
-  Package: *
-  Pin: release a=unstable
-  Pin-Priority: 500
-</code></pre></li>
 </ul>
 
-
-<p>let user buildd use sbuild:</p>
-
-<pre><code># sbuild-adduser buildd
-# su - buildd
-$ cp /usr/share/doc/sbuild/examples/example.sbuildrc ~/.sbuildrc
-    $mailto='azuwis@163.org';
-    $apt_update = 1;
-    $key_id = 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;';
-    $pgp_options = '';
-</code></pre>
-
-<p>generate gpg key for sbuild to sign and upload:</p>
-
-<pre><code>$ echo -n "" | gpg
-$ echo -n "" | gpg
-$ gpg --gen-key
-  ... use 'Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;'
-</code></pre>
-
-<p>test sbuild and gpg sign, watch ouput and email:</p>
-
-<pre><code>$ sbuild hello_2.2-3
-</code></pre>
-
-<h2>buildd</h2>
-
-<pre><code>$ mkdir -p .ssh build logs mqueue old-logs stats/graphs upload upload-security
-$ chmod o= .ssh upload-security old-logs mqueue logs build
-$ zcat /usr/share/doc/buildd/examples/buildd.conf.gz &gt; buildd.conf
-    $admin_mail = 'azuwis@163.org';
-    $statistics_mail = 'azuwis@163.org';
-    $dupload_to = "azuwis"; # see dupload below
-$ zcat /usr/share/doc/buildd/examples/crontab.gz &gt; cronjob
-    10,25,40,55 * * * * /usr/bin/buildd-uploader
-    20          * * * * /usr/bin/buildd-watcher
-$ crontab cronjob
-</code></pre>
-
-<h2>dupload</h2>
-
-<p>edit ~/.dupload.conf</p>
-
-<pre><code>package config;
-$cfg{'azuwis'} = {
-    fqdn =&gt; "azuwis.people.163.org",
-    method =&gt; "ftp",
-    incoming =&gt; "/pub/UploadQueue/",
-    login =&gt; "anonymous",
-    dinstall_runs =&gt; 1,
-};
-1;
-</code></pre>
-
-<h2>wanna-build</h2>
-
-<pre><code>$ mkdir ~/wanna-build
-$ chown 2755 ~/wanna-build
-$ cp /etc/buildd/wanna-build.conf ~/.wanna-buildrc
-    $basedir = "/home/buildd/wanna-build";
-    $db_maint = 'azuwis@163.org';
-    $notforus_maint = 'azuwis@163.org';
-    $log_mail = 'azuwis@163.org';
-    $stat_mail = 'azuwis@163.org';
-    $web_stats = "/home/buildd/wanna-build/stats.txt";
-</code></pre>
-
-<h2>reprepro</h2>
-
-<pre><code># useradd -m -s /bin/bash reprepro
-# su - reprepro
-</code></pre>
-
-<p>edit conf/distributions:</p>
-
-<pre><code>Origin: Azuwis
-Label: Azuwis
-Suite: unstable
-Codename: sid
-Architectures: i386 source
-Components: main
-Description: Random packages not in offical Debian archive
-SignWith: yes
-Uploaders: uploaders
-DscIndices: Sources Release . .gz .bz2
-DebIndices: Packages Release . .gz .bz2
-
-Origin: Azuwis
-Label: Azuwis
-Suite: experimental
-Codename: experimental
-AlsoAcceptFor: UNRELEASED
-Architectures: i386 source
-Components: main
-Description: Random packages not in offical Debian archive and experimental; use at your own risk.
-SignWith: yes
-NotAutomatic: yes
-Uploaders: uploaders
-DscIndices: Sources Release . .gz .bz2
-DebIndices: Packages Release . .gz .bz2
-</code></pre>
-
-<p>edit conf/uploaders, only allow some users to upload, gpg pubkeys need to be imported, see below for how to get key-id and how to import:</p>
-
-<pre><code>allow * by key 5F617B74853F1566 # Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;
-</code></pre>
-
-<p>edit conf/incoming:</p>
-
-<pre><code>Name: incoming
-IncomingDir: incoming
-TempDir: temp
-Allow: unstable&gt;sid experimental&gt;experimental UNRELEASED&gt;experimental
-</code></pre>
-
-<p>prepare for ftp upload:</p>
-
-<pre><code># chown reprepro:nogroup /home/ftp/pub/UploadQueue # (nogroup is user ftp's main group)
-# chmod 01775 /home/ftp/pub/UploadQueue
-$ ln -s /home/ftp/pub/UploadQueue /home/reprepro/incoming
-</code></pre>
-
-<p>auto process incoming using inoticoming:</p>
-
-<pre><code>$ cp /usr/share/doc/inoticoming/examples/cronjob ~/
-    @reboot inoticoming --logfile /home/reprepro/logs/inoticoming.log /home/reprepro/incoming/ --stderr-to-log --stdout-to-log --suffix '.changes' --chdir /home/reprepro reprepro -b /home/reprepro processincoming incoming {} \;
-</code></pre>
-
-<p>import user buildd&#8217;s gpg key, import other users&#8217; in the same way, remember add key-id to conf/uploaders:</p>
-
-<pre><code>buildd@:~$ gpg --with-colons --list-secret-keys
-    sec::1024:17:5F617B74853F1566:2008-12-16::::Azuwis Debian Repository Build Daemon &lt;azuwis@163.org&gt;:::
-    ssb::2048:16:04A6D58060BC8BE7:2008-12-16:::::::
-buildd@:~$ gpg -a --export 5F617B74853F1566 &gt; ~/buildd.asc
-reprepro@:~$ gpg --import /home/buildd/buildd.asc
-</code></pre>
-
-<p>export reprepro&#8217;s gpg pubkey to public:</p>
-
-<pre><code>reprepro@:~$ gpg --with-colons --list-secret-keys
-    sec::1024:17:43A170358765EF08:2008-11-28::::Azuwis' Debian Repository &lt;azuwis@gmail.com&gt;:::
-    ssb::2048:16:2CEB4DD6864C12E2:2008-11-28:::::::
-reprepro@:~$ gpg -a --export 43A170358765EF08 &gt; reprepro.asc
-</code></pre>
-
-<p>trust local repo in sbuild chroots:</p>
-
-<pre><code># sbuild-shell unstable
-# apt-key add /home/reprepro/reprepro.asc
-</code></pre>
-
-<h2>Reference</h2>
-
-<ul>
-<li>/usr/share/doc/buildd/examples/buildd-setup-system.gz</li>
-<li>/usr/share/doc/reprepro/manual.html</li>
-</ul>
 
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2008/12/12/custom-debian-repository/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -679,7 +535,7 @@ parm:           debug:Enable debug output (int)
   </header>
 
 
-  <div class="entry-content"><p><img src="http://www.mozilla.com/img/tignish/about/logo/download/logo-only-preview.png" alt="Firefox" />
+  <div class="entry-content"><p><img class="right" src="http://www.mozilla.com/img/tignish/about/logo/download/logo-only-preview.png" title="Firefox" >
 Firefox 自己并不能方便的给状态栏的图标重新排序，有一个扩展叫 <a href="https://addons.mozilla.org/en-US/firefox/addon/1759">Organize Status Bar</a>，可以比较方便的做这个事情。但只是是为了重新排序而装一个扩展，似乎并不值得。</p>
 
 <p>其实，Firefox 状态栏的图标一般是由扩展产生的，图标的顺序跟扩展的安装顺序对应。通过改扩展的顺序，可以改变状态栏图标的顺序。</p>
@@ -782,39 +638,65 @@ Extension1=/home/azuwis/.mozilla/firefox/cv7nxof9.default/extensions/{0C4B554C-0
   </header>
 
 
-  <div class="entry-content"><p><img src="http://calendar.google.com/googlecalendar/images/calendar_logo_sm_en.gif" alt="google calendar" />
+  <div class="entry-content"><p><img class="right" src="http://calendar.google.com/googlecalendar/images/calendar_logo_sm_en.gif" title="google calendar" >
 google calendar 的短信提醒服务支持中国移动(联通不知道是不是支持)，可以通过 google 提供的 GData 接口给 google calendar 添加短信提醒，从而达到短信接口的效果。</p>
 
 <p>首先是让你的 google calendar 帐号跟你的手机绑定。</p>
 
 <p>下面是一个 ruby 代码实现添加提醒:</p>
 
-<pre><code>#!/usr/bin/ruby
-require 'rubygems'
-require 'googlecalendar'
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1">#!/usr/bin/ruby</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;googlecalendar&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">sms</span><span class="p">(</span><span class="n">google_acount</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">now</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">utc</span>
+</span><span class='line'>  <span class="c1"># 添加一个 360 秒后的事件</span>
+</span><span class='line'>  <span class="n">startTime</span> <span class="o">=</span> <span class="p">(</span><span class="n">now</span> <span class="o">+</span> <span class="mi">360</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S.000Z&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">endTime</span> <span class="o">=</span> <span class="p">(</span><span class="n">now</span> <span class="o">+</span> <span class="mi">3600</span> <span class="o">+</span> <span class="mi">360</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S.000Z&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">g</span> <span class="o">=</span> <span class="no">GData</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">google_acount</span> <span class="o">+</span> <span class="s1">&#39;@gmail.com&#39;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">event</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:title</span><span class="o">=&gt;</span><span class="n">message</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:content</span><span class="o">=&gt;</span><span class="n">message</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:author</span><span class="o">=&gt;</span><span class="n">google_acount</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:email</span><span class="o">=&gt;</span><span class="n">google_acount</span> <span class="o">+</span> <span class="s1">&#39;@gmail.com&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:where</span><span class="o">=&gt;</span><span class="s1">&#39;some place&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:startTime</span><span class="o">=&gt;</span><span class="n">startTime</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:endTime</span><span class="o">=&gt;</span><span class="n">endTime</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="c1"># 给事件添加一个提前 5 分钟的 sms 提醒</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">add_reminder</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;sms&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">new_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sms</span><span class="p">(</span><span class="n">google_acount</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="s1">&#39;a test&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
 
-def sms(google_acount, password, message)
-  now = Time.now.utc
-  # 添加一个 360 秒后的事件
-  startTime = (now + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  endTime = (now + 3600 + 360).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  g = GData.new
-  g.login(google_acount + '@gmail.com', password)
-  event = { :title=&gt;message,
-    :content=&gt;message,
-    :author=&gt;google_acount,
-    :email=&gt;google_acount + '@gmail.com',
-    :where=&gt;'some place',
-    :startTime=&gt;startTime,
-    :endTime=&gt;endTime
-  }
-  # 给事件添加一个提前 5 分钟的 sms 提醒
-  g.add_reminder(event, 5, 'sms')
-  g.new_event(event)
-end
-
-sms(google_acount, password, 'a test')
-</code></pre>
 
 <p>googlecalendar 的 rubygem 可以用 gem install googlecalendar 来安装。</p>
 
@@ -892,7 +774,7 @@ sms(google_acount, password, 'a test')
 
 <section class="tag-cloud">
   <h1>Tags</h1>
-  <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> 
+  <span class='rank-5'><a href='/blog/tags/SMS'>SMS</a></span> <span class='rank-5'><a href='/blog/tags/module'>module</a></span> <span class='rank-5'><a href='/blog/tags/linux'>linux</a></span> <span class='rank-5'><a href='/blog/tags/x86-64'>x86_64</a></span> <span class='rank-5'><a href='/blog/tags/tip'>tip</a></span> <span class='rank-5'><a href='/blog/tags/DotA'>DotA</a></span> <span class='rank-5'><a href='/blog/tags/calendar'>calendar</a></span> <span class='rank-5'><a href='/blog/tags/google'>google</a></span> <span class='rank-5'><a href='/blog/tags/debootstrap'>debootstrap</a></span> <span class='rank-5'><a href='/blog/tags/IRC'>IRC</a></span> <span class='rank-1'><a href='/blog/tags/debian'>debian</a></span> <span class='rank-5'><a href='/blog/tags/autohotkey'>autohotkey</a></span> <span class='rank-5'><a href='/blog/tags/firefox'>firefox</a></span> <span class='rank-5'><a href='/blog/tags/war3'>war3</a></span> <span class='rank-5'><a href='/blog/tags/pastebin'>pastebin</a></span> <span class='rank-5'><a href='/blog/tags/kernel'>kernel</a></span> 
 </section>
 
   
